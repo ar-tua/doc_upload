@@ -16,6 +16,11 @@ var params = parse_params(process.argv.splice(2))
 var filepath = params['--file'];
 var case_id = params['--case']
 
+// get case id from filename
+if (!case_id) {
+    case_id = get_name_and_ext()[0]
+}
+
 var auth_header = { 'Authorization': 'Basic ' + base64(user_id + ":" + secret) }
 
 function base64(str) {
@@ -23,10 +28,13 @@ function base64(str) {
     return buff.toString('base64');
 }
 
+function get_name_and_ext() {
+    var splitted = filepath.split(path.sep)
+    return splitted[splitted.length - 1].split(".")
+}
 
 async function sign_url() {
-    var splitted = filepath.split(path.sep)
-    var [name, ext] = splitted[splitted.length - 1].split(".")
+    var [name, ext] = get_name_and_ext()
     var body = {
         "method": "billogica.document/create",
         "params": {
